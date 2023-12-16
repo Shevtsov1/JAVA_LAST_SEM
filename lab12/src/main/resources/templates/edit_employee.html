@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Edit Employee</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: xx-large;
+            background-image: url('https://californiapayroll.com/wp-content/uploads/2022/01/payroll-banner-image.png');
+            background-size: cover;
+            background-position: initial;
+        }
+
+        .container {
+            width: 40%;
+            align-items: center;
+            justify-content: center;
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            text-align: center;
+            margin: 50px auto; /* Добавляем отступы сверху и снизу, а горизонтальное выравнивание задаем автоматически */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5); /* Добавляем тень для контейнера */
+        }
+
+        .form-container {
+            margin-top: 20px; /* Добавляем отступ сверху для формы */
+        }
+
+        .form-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            justify-content: space-between; /* Располагаем элементы формы по горизонтали с одинаковыми промежутками между ними */
+        }
+
+        .form-group label {
+            width: 27%;
+            font-size: x-large;
+            text-align: right;
+            margin-right: 10px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            padding: 5px;
+            border-radius: 5px;
+            width: 70%;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+
+        .button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            text-decoration: none;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .home-btn {
+            background: aquamarine;
+            position: absolute;
+            top: 2%;
+            left: 2%;
+        }
+    </style>
+</head>
+<body>
+<button class="home-btn">
+    <a th:href="@{/home}"><img src="/home.png" alt="home"/></a>
+</button>
+<div class="container">
+    <h1>Изменить сотрудника</h1>
+
+    <div class="form-container">
+        <div class="form-group">
+            <label for="employee-select">Выберите сотрудника:</label>
+            <select style="width: 70%" id="employee-select" onchange="selectEmployee(this.value)">
+                <option value="">-- Выберите сотрудника --</option>
+                <option th:each="employee : ${employees}" th:value="${employee.id}" th:text="${employee.surname + ' ' + employee.name + ' ' + employee.patronymic}"></option>
+            </select>
+        </div>
+        <form id="updateEmployeeForm" style="display: none;" action="/employees/edit" method="post">
+            <input type="hidden" id="employee-id" name="id">
+            <div class="form-group">
+                <label for="surname">Фамилия:</label>
+                <input type="text" id="surname" name="surname">
+            </div>
+            <div class="form-group">
+                <label for="name">Имя:</label>
+                <input type="text" id="name" name="name">
+            </div>
+            <div class="form-group">
+                <label for="patronymic">Отчество:</label>
+                <input type="text" id="patronymic" name="patronymic">
+            </div>
+            <div class="form-group">
+                <label for="position">Должность:</label>
+                <input type="text" id="position" name="position">
+            </div>
+            <div class="form-group">
+                <label for="hourly-rate">Ставка руб/ч:</label>
+                <input type="number" id="hourly-rate" name="hourlyRate">
+            </div>
+            <div class="form-group">
+                <label for="date">Последние изменения:</label>
+                <input type="text" id="date" name="date" readonly>
+            </div>
+            <div class="form-group">
+                <label for="current-date">Текущая дата:</label>
+                <input type="text" id="current-date" name="currentDate" readonly>
+            </div>
+            <div class="form-group">
+                <label for="hoursWorked">Отработанные часы:</label>
+                <input type="number" id="hoursWorked" name="hoursWorked">
+            </div>
+            <div class="buttons-container">
+                <button type="submit" class="button">Обновить</button>
+                <button type="button" class="button" onclick="deleteEmployee()">Удалить</button>
+            </div>
+        </form>
+    </div>
+    <div class="buttons-container">
+        <a class="button" th:href="@{/employees}">Сотрудники</a>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    const employees = [[${employees}]];
+    const timesheets = [[${timesheets}]];
+
+    function selectEmployee(employeeId) {
+        document.getElementById("updateEmployeeForm").style.display = "block";
+        const selectedEmployee = employees.find(employee => employee.id === employeeId);
+        const selectedEmployeeTimesheet = timesheets.find(timesheet => timesheet.employeeId === employeeId);
+
+        document.getElementById("employee-id").value = selectedEmployee.id;
+        document.getElementById("surname").value = selectedEmployee.surname;
+        document.getElementById("name").value = selectedEmployee.name;
+        document.getElementById("patronymic").value = selectedEmployee.patronymic;
+        document.getElementById("position").value = selectedEmployee.position;
+        document.getElementById("hourly-rate").value = selectedEmployee.hourlyRate;
+        document.getElementById("date").value = selectedEmployeeTimesheet.date;
+        const currentDate = new Date().toLocaleDateString('en-US');
+        document.getElementById("current-date").value = currentDate;
+        document.getElementById("hoursWorked").value = selectedEmployeeTimesheet.hoursWorked;
+    }
+    const form = document.getElementById('updateEmployeeForm');
+
+
+    // Обработчик события отправки формы
+    form.addEventListener('submit', function (event) {
+        event.preventDefault(); // Отменяем перезагрузку страницы
+
+        // Выполните запрос Ajax для отправки данных формы на сервер
+        fetch(form.action, {
+            method: form.method,
+            body: new FormData(form)
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Показать информационное сообщение при успешном ответе сервера
+                    alert('Пользователь обновлен');
+                } else {
+                    // Обработка ошибки, если запрос не удался
+                    console.error('Ошибка при обновлении сотрудника');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при обновлении сотрудника', error);
+            });
+    });
+
+    function deleteEmployee() {
+        const employeeId = document.getElementById("employee-id").value;
+        const confirmation = confirm("Вы уверены, что хотите удалить этого сотрудника?");
+
+        if (confirmation) {
+            fetch("/employees/delete", {
+                method: "POST",
+                body: new URLSearchParams({ id: employeeId })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        alert("Сотрудник удален");
+                        window.location.href = "/employees";
+                    } else {
+                        console.error("Ошибка при удалении сотрудника");
+                    }
+                })
+                .catch(error => {
+                    console.error("Ошибка при удалении сотрудника", error);
+                });
+        }
+    }
+</script></body>
+</html>

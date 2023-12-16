@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Add employee</title>
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: xx-large;
+            background-image: url('https://californiapayroll.com/wp-content/uploads/2022/01/payroll-banner-image.png');
+            background-size: cover;
+            background-position: initial;
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 30px;
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        label {
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        input[type="text"],
+        input[type="number"] {
+            width: 300px;
+            padding: 5px;
+            border-radius: 5px;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
+        }
+        .button {
+            padding: 5px 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            text-decoration: none;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        .home-btn {
+            background: aquamarine;
+            position: absolute;
+            top: 2%;
+            left: 2%;
+        }
+    </style>
+</head>
+<body class="container">
+<button class="home-btn">
+    <a th:href="@{/home}"><img src="/home.png" alt="home"/></a>
+</button>
+<h1>Добавить сотрудника</h1>
+<form id="addEmployeeForm" action="/employees" method="post">
+
+    <label for="surname">Фамилия:</label>
+    <input type="text" id="surname" name="surname" required>
+
+    <label for="name">Имя:</label>
+    <input type="text" id="name" name="name" required>
+
+    <label for="patronymic">Отчество:</label>
+    <input type="text" id="patronymic" name="patronymic">
+
+    <label for="position">Должность:</label>
+    <input type="text" id="position" name="position" required>
+
+    <label for="hourlyRate">Ставка в час:</label>
+    <input type="number" id="hourlyRate" name="hourlyRate" required>
+
+    <label for="hoursWorked">Отработанные часы:</label>
+    <input type="number" id="hoursWorked" name="hoursWorked">
+
+    <input type="submit" value="Добавить сотрудника">
+</form>
+<div class="buttons-container">
+    <a class="button" th:href="@{/employees}">Сотрудники</a>
+</div>
+<script>
+    // Поиск элемента формы
+    const form = document.getElementById('addEmployeeForm');
+
+    // Обработчик события отправки формы
+    form.addEventListener('submit', function (event) {
+        event.preventDefault(); // Отменяем перезагрузку страницы
+
+        // Выполните запрос Ajax для отправки данных формы на сервер
+        fetch(form.action, {
+            method: form.method,
+            body: new FormData(form)
+        })
+            .then(response => {
+                if (response.ok) {
+                    // Показать информационное сообщение при успешном ответе сервера
+                    alert('Пользователь добавлен');
+                } else {
+                    // Обработка ошибки, если запрос не удался
+                    console.error('Ошибка при добавлении сотрудника');
+                }
+            })
+            .catch(error => {
+                console.error('Ошибка при добавлении сотрудника', error);
+            });
+    });
+</script>
+</body>
+</html>

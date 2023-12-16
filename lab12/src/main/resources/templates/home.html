@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="ru">
+<head>
+    <title>Home</title>
+</head>
+<style>
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        font-size: xx-large;
+        background-image: url('https://californiapayroll.com/wp-content/uploads/2022/01/payroll-banner-image.png');
+        background-size: cover;
+        background-position: initial;
+    }
+    .list-container {
+        display: flex;
+        flex-direction: column;
+        margin-top: 30vh;
+        list-style-type: none;
+        padding: 0;
+    }
+    .link-container {
+        margin-bottom: 5px;
+        padding:5px;
+        background-color: rgba(180, 180, 180, 0.9);
+        border-radius: 10px;
+        color: black;
+    }
+    .link {
+        text-decoration: none;
+        font-size: xxx-large;
+        color: black;
+    }
+    .link:hover {
+        color: blue;
+    }
+</style>
+<body class="container">
+<h1>Калькулятор зарплат</h1>
+<div class="list-container">
+    <button class="link-container">
+        <a class="link" th:href="@{/employees}">Все сотрудники</a>
+    </button>
+    <button class="link-container">
+        <a class="link" th:href="@{/employees/add}">Добавить сотрудника</a>
+    </button>
+    <button class="link-container">
+        <a class="link" th:href="@{/employees/edit}">Изменить сотрудника</a>
+    </button>
+</div>
+</body>
+</html>
